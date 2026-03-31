@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Vault Messenger v5.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --accent: #22d3ee; --bg: #020617; }
+        body {
+            background: radial-gradient(circle at top right, #083344, #020617, #000000);
+            font-family: 'Outfit', sans-serif;
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+        .app-name {
+            background: linear-gradient(to bottom, #ffffff 30%, #22d3ee 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.3));
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .neo-input {
+            background: rgba(2, 6, 23, 0.8);
+            border: 1px solid #1e293b;
+        }
+        .privacy-blur { filter: blur(20px); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+    <div id="mainApp" class="w-full max-w-lg glass rounded-[3rem] p-8 md:p-12 relative overflow-hidden">
+        <div class="flex flex-col items-center mb-10">
+            <div class="w-20 h-20 bg-gradient-to-br from-cyan-400 to-blue-600 p-[1px] rounded-3xl mb-6 shadow-2xl">
+                <div class="w-full h-full bg-[#020617] rounded-[23px] flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+            </div>
+            <h1 class="app-name text-4xl font-black mb-1">VAULT MESSENGER</h1>
+            <p class="text-[9px] tracking-[0.5em] text-slate-500 font-bold uppercase">v5.0 Privacy Protocol</p>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3 mb-8">
+            <div class="bg-slate-950/50 p-3 rounded-2xl border border-slate-800 text-center">
+                <label class="text-[8px] font-black text-cyan-500 uppercase block mb-1">Shift</label>
+                <input type="number" id="shift" value="12" class="bg-transparent w-full text-center font-bold text-lg outline-none">
+            </div>
+            <button onclick="toggleSet('ghost')" id="ghostBtn" class="bg-slate-950/50 p-3 rounded-2xl border border-slate-800">
+                <label class="text-[8px] font-bold text-slate-500 uppercase block mb-1">Ghost</label>
+                <span id="ghostStat" class="text-[10px] font-black text-slate-400">OFF</span>
+            </button>
+            <button onclick="toggleSet('stealth')" id="stealthBtn" class="bg-slate-950/50 p-3 rounded-2xl border border-slate-800">
+                <label class="text-[8px] font-bold text-slate-500 uppercase block mb-1">Stealth</label>
+                <span id="stealthStat" class="text-[10px] font-black text-slate-400">OFF</span>
+            </button>
+        </div>
+
+        <textarea id="msgInput" placeholder="আপনার বার্তাটি লিখুন..." class="w-full neo-input rounded-[2rem] p-6 h-40 text-slate-200 outline-none text-lg resize-none mb-6"></textarea>
+
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <button onclick="run('enc')" class="bg-cyan-500 text-slate-950 font-black py-5 rounded-2xl active:scale-95">ENCRYPT</button>
+            <button onclick="run('dec')" class="bg-slate-800 text-white font-black py-5 rounded-2xl active:scale-95">DECRYPT</button>
+        </div>
+
+        <div id="resArea" class="hidden">
+            <div class="bg-cyan-500/5 border border-cyan-500/10 rounded-[2rem] p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span id="resLabel" class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Output</span>
+                    <button onclick="copyIt()" class="text-[10px] bg-white text-black px-4 py-1.5 rounded-full font-black">COPY</button>
+                </div>
+                <p id="resText" class="text-xl font-medium text-white break-words"></p>
+            </div>
+        </div>
+
+        <footer class="mt-8 pt-6 border-t border-slate-900 text-center">
+            <p class="text-[8px] text-slate-700 font-black uppercase tracking-[0.5em]">Bangladesh • 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        let settings = { ghost: false, stealth: false };
+        function toggleSet(type) {
+            settings[type] = !settings[type];
+            document.getElementById(type + 'Stat').innerText = settings[type] ? "ACTIVE" : "OFF";
+            if(type === 'stealth') document.getElementById('msgInput').style.webkitTextSecurity = settings[type] ? "disc" : "none";
+        }
+        function run(mode) {
+            const input = document.getElementById('msgInput');
+            let shift = parseInt(document.getElementById('shift').value) || 0;
+            if(!input.value) return;
+            if(mode === 'dec') shift = -shift;
+            const result = input.value.split('').map(c => String.fromCharCode(c.charCodeAt(0) + (c === ' ' ? 0 : shift))).join('');
+            document.getElementById('resText').innerText = result;
+            document.getElementById('resArea').classList.remove('hidden');
+            if(settings.ghost) input.value = '';
+        }
+        function copyIt() {
+            navigator.clipboard.writeText(document.getElementById('resText').innerText);
+            alert("Copied!");
+        }
+    </script>
+</body>
+</html>
