@@ -1,0 +1,8 @@
+{
+  "appId": "com.vault.messenger.v5",
+  "appName": "Vault Messenger v5",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}
